@@ -15,7 +15,8 @@ builder.Services.AddControllersWithViews()
 
 builder.Services.AddDbContext<DatabaseContext>((service, options) =>
 {
-    var connectionString = service.GetRequiredService<IConfiguration>().GetConnectionString("vinlotteridb");
+    var connectionString = service.GetRequiredService<IConfiguration>().GetConnectionString("vinlotteridb")
+        ?? Environment.GetEnvironmentVariable("POSTGRESQLCONNSTR_vinlotteridb");
     options.UseNpgsql(connectionString);
 });
 

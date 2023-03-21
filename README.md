@@ -22,4 +22,4 @@ The task was to implement a fullstack vinlotteri app with focus on the backend, 
 - An ASP.NET application commanding and querying the database from the controller, and not much else.
 - A React frontend, displaying tickets and users.
 
-PS. There db secret is in this repo, I had some problem using Configurations from App Service to read the connection string in the app, so I gave up on that.
+~~PS. There db secret is in this repo, I had some problem using Configurations from App Service to read the connection string in the app, so I gave up on that.~~
