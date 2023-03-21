@@ -18,6 +18,7 @@ builder.Services.AddDbContext<DatabaseContext>((service, options) =>
     var connectionString = service.GetRequiredService<IConfiguration>().GetConnectionString("vinlotteridb");
     options.UseNpgsql(connectionString);
 });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

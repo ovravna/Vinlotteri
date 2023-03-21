@@ -3,6 +3,7 @@ import React, {Component, useEffect, useState} from 'react';
 export const TicketTable = (props) => {
 
     const [errorMessages, setErrorMessages] = useState("")
+    const [drawnTicket, setDrawnTicket] = useState(null);
 
     const [content, setContent] = useState(<p><em>Loading...</em></p>)
     
@@ -52,7 +53,6 @@ export const TicketTable = (props) => {
             const text = await response.text(); 
             setErrorMessages(text)
         }
-        
     }
 
     const addUserAsync = async (username) => {
@@ -67,7 +67,65 @@ export const TicketTable = (props) => {
             setErrorMessages(text)
         }
     };
+
+    const drawAsync = async () => {
+
+        const response = await fetch(`ticket/draw`, {
+            method : 'POST'
+        });
+        if (response.ok){
+            var data = await response.json();
+            setDrawnTicket(data);
+            await loadDataAsync();
+        }
+        else {
+            const text = await response.text();
+            setErrorMessages(text)
+        }
+    };
     
+    const resetDrawAsync = async () => {
+
+        const response = await fetch(`ticket/resetdraw`, {
+            method : 'POST'
+        });
+        if (response.ok){
+            setDrawnTicket(null)
+            await loadDataAsync();
+        }
+        else {
+            const text = await response.text();
+            setErrorMessages(text)
+        }
+    }
+    
+    const resetTicketsAsync = async () => {
+
+        const response = await fetch(`ticket/resettickets`, {
+            method : 'POST'
+        });
+        if (response.ok){
+            await loadDataAsync();
+        }
+        else {
+            const text = await response.text();
+            setErrorMessages(text)
+        }
+    }
+    
+    const resetUsersAsync = async () => {
+
+        const response = await fetch(`ticket/resetusers`, {
+            method : 'POST'
+        });
+        if (response.ok){
+            await loadDataAsync();
+        }
+        else {
+            const text = await response.text();
+            setErrorMessages(text)
+        }
+    }
     const renderTicketTable = (data) => {
         return (
             <div>
@@ -77,6 +135,7 @@ export const TicketTable = (props) => {
                     <tr>
                         <th>Name</th>
                         <th>Tickets</th>
+                        <th>Drawn Tickets</th>
                         <th></th>
                     </tr>
                     </thead>
@@ -84,7 +143,8 @@ export const TicketTable = (props) => {
                     {data.map(t =>
                         <tr key={t.id}>
                             <td>{t.name}</td>
-                            <td>{t.tickets.map(t => t.number).join(" ")}</td>
+                            <td>{t.tickets.filter(t => !t.hasBeenDrawn).map(t => t.number).sort().join(" ")}</td>
+                            <td>{t.tickets.filter(t => t.hasBeenDrawn).map(t => t.number).sort().join(" ")}</td>
                             <td>
                                 <ComponentInput placeholder="Ticket Number" onClick={(value) => addTicketAsync(t.name, value)}></ComponentInput>
                             </td>
@@ -103,8 +163,17 @@ export const TicketTable = (props) => {
 
     return (
         <div>
-            <h1 id="tabelLabel">Tickets</h1>
+            <div style={{display: "flex" , flexDirection: "row", padding: "10px"}}>
+                <h1 id="tabelLabel">Tickets</h1>
+                <div style={{width: "70%"}}></div>
+                <button style={{margin: "10px"}} onClick={resetTicketsAsync}>Reset Tickets</button>
+                <button style={{margin: "10px"}} onClick={resetUsersAsync}>Reset Users</button>
+            </div>
             {content}
+            <button style={{margin: "10px"}} onClick={drawAsync}>Draw</button>
+            <button style={{margin: "10px"}} onClick={resetDrawAsync}>Reset draw</button>
+            {drawnTicket == null ? "" : `${drawnTicket.user.name} has won with the ticket ${drawnTicket.number}!!!` }
+            <br/>
             {errorMessages}
         </div>
     );

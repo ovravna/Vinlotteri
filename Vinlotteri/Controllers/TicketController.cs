@@ -78,6 +78,52 @@ public class TicketController
         _databaseContext.SaveChanges();
     }
 
+    [HttpPost("resetdraw")]
+    public async Task<string> ResetDraw()
+    {
+        await _databaseContext.Ticket.ForEachAsync(t => t.HasBeenDrawn = false);
+
+        await _databaseContext.SaveChangesAsync();
+        return "OK";
+    }
+    
+    [HttpPost("resettickets")]
+    public async Task<string> ResetTickets()
+    {
+        var tickets = _databaseContext.Ticket.ToArray();
+        _databaseContext.Ticket.RemoveRange(tickets);
+
+        await _databaseContext.SaveChangesAsync();
+        return "OK";
+    }
+    
+    [HttpPost("resetusers")]
+    public async Task<string> ResetUsers()
+    {
+        var users = _databaseContext.User.ToArray();
+        _databaseContext.User.RemoveRange(users);
+
+        await _databaseContext.SaveChangesAsync();
+        return "OK";
+    }
+    [HttpPost("draw")]
+    public Ticket? Draw()
+    {
+        var tickets = _databaseContext.Ticket
+            .Include(t => t.User)
+            .Where(t => !t.HasBeenDrawn).ToList();
+
+        if (tickets.Count == 0)
+            return null;
+        
+        var index = Random.Shared.Next(tickets.Count);
+        var ticket = tickets[index];
+        
+        ticket.HasBeenDrawn = true;
+        _databaseContext.SaveChanges();
+        return ticket;
+    }
+
     [Route("/error")]
     public string Error()
     {

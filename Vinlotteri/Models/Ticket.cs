@@ -7,4 +7,5 @@ public class Ticket
     public int Id { get; set; }
     public int Number { get; set; }
     public User User { get; set; }
+    public bool HasBeenDrawn { get; set; } = false;
 }
